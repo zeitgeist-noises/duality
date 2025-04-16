@@ -1,7 +1,7 @@
 notes.txt
 
-build
+build/*
 
 .vscode
 
-JUCE
+JUCE/*
