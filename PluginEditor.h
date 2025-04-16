@@ -56,7 +56,7 @@ private:
 
     juce::ComboBox modeList;
     void modeSelected();
-    const juce::StringArray modeNames = {"flip", "+pi/2", "-pi/2"};
+    const juce::StringArray modeNames = {"flip f=t", "flip f=fmax-t", "+pi/2", "-pi/2", "+pi"};
 
     juce::Label sourceLabel;
     juce::Label transformLabel;

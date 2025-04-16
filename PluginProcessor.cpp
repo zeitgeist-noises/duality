@@ -315,7 +315,7 @@ void DualityAudioProcessor::ifft(juce::AudioBuffer<float> &data)
 
 void DualityAudioProcessor::transform(juce::AudioBuffer<float> &data)
 {
-    if(transformMode == "flip")
+    if(transformMode == "flip f=t")
         ifft(data);
     else if(transformMode == "+pi/2")
     {
@@ -326,13 +326,26 @@ void DualityAudioProcessor::transform(juce::AudioBuffer<float> &data)
     {
         data.reverse(0, data.getNumSamples());
         ifft(data);
+    }
+    else if(transformMode == "+pi")
+    {
+        ifft(data);
+        data.reverse(0, data.getNumSamples());
+        ifft(data);
+        data.reverse(0, data.getNumSamples());
+    }
+    else if(transformMode == "flip f=fmax-t")
+    {
+        data.reverse(0, data.getNumSamples());
+        ifft(data);
+        data.reverse(0, data.getNumSamples());
     }
 
 }
 
 void DualityAudioProcessor::itransform(juce::AudioBuffer<float> &data)
 {
-    if(transformMode == "flip")
+    if(transformMode == "flip f=t")
         ifft(data);
     else if(transformMode == "+pi/2")
     {
@@ -341,6 +354,19 @@ void DualityAudioProcessor::itransform(juce::AudioBuffer<float> &data)
     }
     else if(transformMode == "-pi/2")
     {
+        ifft(data);
+        data.reverse(0, data.getNumSamples());
+    }
+    else if(transformMode == "+pi")
+    {
+        data.reverse(0, data.getNumSamples());
+        ifft(data);
+        data.reverse(0, data.getNumSamples());
+        ifft(data);
+    }
+    else if(transformMode == "flip f=fmax-t")
+    {
+        data.reverse(0, data.getNumSamples());
         ifft(data);
         data.reverse(0, data.getNumSamples());
     }
