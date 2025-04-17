@@ -7,7 +7,6 @@
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
                                           public juce::FileDragAndDropTarget,
-                                          public juce::ChangeListener,
                                           public juce::Slider::Listener,
                                           public juce::ComboBox::Listener
 {
@@ -73,7 +72,6 @@ private:
     juce::AudioThumbnailCache thumbnailCache;
     juce::AudioThumbnail sourceWaveform;
     juce::AudioThumbnail transformedWaveform;
-    void changeListenerCallback(juce::ChangeBroadcaster *source) override;
     void loadFilesIntoEditor();
 
     //globals

@@ -15,7 +15,7 @@ DualityAudioProcessor::DualityAudioProcessor()
     formatManager.registerBasicFormats();
     transportSource.addChangeListener(this);
     effect = new Distortion();
-    transformMode = "flip";
+    transformMode = "flip f=t";
 }
 
 DualityAudioProcessor::~DualityAudioProcessor()
@@ -253,7 +253,7 @@ void DualityAudioProcessor::changeListenerCallback(juce::ChangeBroadcaster *sour
     }
 }
 
-void DualityAudioProcessor::process(juce::File &inputFile, juce::File &transformedFile)
+void DualityAudioProcessor::process(const juce::File &inputFile, juce::File &transformedFile)
 {
     juce::AudioFormatReader* reader = formatManager.createReaderFor(inputFile);
     juce::AudioBuffer<float> data = juce::AudioBuffer<float>(reader->numChannels, static_cast<int>(reader->lengthInSamples));

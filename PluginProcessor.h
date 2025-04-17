@@ -60,7 +60,7 @@ public:
     //MY STUFF
     void changeState(TransportState newState);
     void loadFile(juce::File &filename);
-    void process(juce::File &inputFile, juce::File &transformedFile);
+    void process(const juce::File &inputFile, juce::File &transformedFile);
 
     EffectSlot *effect;
     void setEffect(juce::String effectType);

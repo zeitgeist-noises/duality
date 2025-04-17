@@ -5,7 +5,7 @@
 DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor& p)
     :   AudioProcessorEditor (&p), 
         processorRef(p),
-        thumbnailCache(5),
+        thumbnailCache(2),
         sourceWaveform(512, formatManager, thumbnailCache),
         transformedWaveform(512, formatManager, thumbnailCache),
         sliders(4),
@@ -120,12 +120,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sliders[i].addListener(this);
     }
 
-    //draw waveforms
-    formatManager.registerBasicFormats();
-    sourceWaveform.addChangeListener(this);
-    transformedWaveform.addChangeListener(this);
-
     //files
+    formatManager.registerBasicFormats();
     juce::File appDataFolder = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory);
     juce::File subFolder = appDataFolder.getChildFile("duality");
     if(!subFolder.exists())
@@ -140,9 +136,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         transformedFile.create();
 
     loadFilesIntoEditor();
-    sourceWaveform.setSource(new juce::FileInputSource(sourceFile));
-    transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
-
 }
 
 DualityAudioProcessorEditor::~DualityAudioProcessorEditor()
@@ -253,8 +246,9 @@ void DualityAudioProcessorEditor::stopButtonClicked()
 void DualityAudioProcessorEditor::transformButtonClicked()
 {
     processorRef.process(sourceFile, transformedFile);
-    processorRef.loadFile(transformedFile);
-    transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
+    //processorRef.loadFile(transformedFile);
+    //transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
+    loadFilesIntoEditor();
 }
 
 void DualityAudioProcessorEditor::saveButtonClicked()
@@ -351,14 +345,12 @@ void DualityAudioProcessorEditor::filesDropped(const juce::StringArray &files, i
     }
 }
 
-void DualityAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
-{
-    if(source == &sourceWaveform || source == &transformedWaveform) repaint();
-}
-
 void DualityAudioProcessorEditor::loadFilesIntoEditor()
 {
-    sourceWaveform.setSource(new juce::FileInputSource(sourceFile));
     processorRef.loadFile(transformedFile);
-    transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
+
+    thumbnailCache.clear();
+    if(sourceWaveform.setSource(new juce::FileInputSource(sourceFile)) &&
+       transformedWaveform.setSource(new juce::FileInputSource(transformedFile)))
+        repaint();
 }
