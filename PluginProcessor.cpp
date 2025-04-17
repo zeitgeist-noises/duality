@@ -263,9 +263,12 @@ void DualityAudioProcessor::process(const juce::File &inputFile, juce::File &tra
     {
         transform(data);
         data.applyGain(1.0f / data.getMagnitude(0, data.getNumSamples()));
-        applyEffects(data);
-        itransform(data);
-        data.applyGain(1.0f / data.getMagnitude(0, data.getNumSamples()));
+        if(!transformOnly)
+        {
+            applyEffects(data);
+            itransform(data);
+            data.applyGain(1.0f / data.getMagnitude(0, data.getNumSamples()));
+        }
 
         juce::WavAudioFormat wavFormat;
         std::unique_ptr<juce::FileOutputStream> outStream(outputFile.createOutputStream());

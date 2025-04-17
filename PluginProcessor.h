@@ -66,6 +66,7 @@ public:
     void setEffect(juce::String effectType);
 
     juce::String transformMode;
+    bool transformOnly = false;
 
     void addTreeChild(juce::ValueTree &parent,
                         const juce::Identifier &childType,

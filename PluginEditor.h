@@ -30,7 +30,6 @@ private:
     DualityAudioProcessor& processorRef;
 
     //gui controls
-    void loadGUI();
 
     juce::TextButton openButton;
     void openButtonClicked();
@@ -43,6 +42,9 @@ private:
 
     juce::TextButton transformButton;
     void transformButtonClicked();
+
+    juce::ToggleButton transformOnlyToggle;
+    void toggleClicked();
 
     juce::TextButton saveButton;
     void saveButtonClicked();

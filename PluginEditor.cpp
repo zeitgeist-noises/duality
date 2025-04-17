@@ -49,6 +49,13 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     transformButton.setButtonText("transform");
     transformButton.onClick = [this]{transformButtonClicked();};
 
+    addAndMakeVisible(transformOnlyToggle);
+    transformOnlyToggle.setColour(transformOnlyToggle.textColourId, highlightColour);
+    transformOnlyToggle.setColour(transformOnlyToggle.tickColourId, highlightColour);
+    transformOnlyToggle.setColour(transformOnlyToggle.tickDisabledColourId, highlightColour);
+    transformOnlyToggle.setButtonText("tranform\nonly");
+    transformOnlyToggle.onClick = [this]{toggleClicked();};
+
     addAndMakeVisible(saveButton);
     saveButton.setColour(saveButton.buttonColourId, highlightColour);
     saveButton.setColour(saveButton.textColourOffId, bgColour);
@@ -197,6 +204,7 @@ void DualityAudioProcessorEditor::resized()
     }
 
     transformButton.setBounds(margin+10, 375, 180-margin, 45);
+    transformOnlyToggle.setBounds(200, 375, 100, 45);
 
     //output
     outputLabel.setBounds(margin, 430+margin, 100, 20);
@@ -249,6 +257,16 @@ void DualityAudioProcessorEditor::transformButtonClicked()
     //processorRef.loadFile(transformedFile);
     //transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
     loadFilesIntoEditor();
+}
+
+void DualityAudioProcessorEditor::toggleClicked()
+{
+    bool effectsEnabled = !transformOnlyToggle.getToggleState();
+    effectList.setEnabled(effectsEnabled);
+    for(int i = 0; i < sliders.size(); i++)
+        sliders[i].setEnabled(effectsEnabled);
+
+    processorRef.transformOnly = !effectsEnabled;
 }
 
 void DualityAudioProcessorEditor::saveButtonClicked()
