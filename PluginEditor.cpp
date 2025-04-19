@@ -254,8 +254,6 @@ void DualityAudioProcessorEditor::stopButtonClicked()
 void DualityAudioProcessorEditor::transformButtonClicked()
 {
     processorRef.process(sourceFile, transformedFile);
-    //processorRef.loadFile(transformedFile);
-    //transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
     loadFilesIntoEditor();
 }
 

@@ -76,6 +76,7 @@ target_sources(Duality
         effect_modules/NoiseConvolution.cpp
         effect_modules/Pad.cpp
         effect_modules/Delay.cpp
+        effect_modules/SampleSkew.cpp
         )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer

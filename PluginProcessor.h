@@ -6,6 +6,7 @@
 #include "effect_modules/NoiseConvolution.h"
 #include "effect_modules/Pad.h"
 #include "effect_modules/Delay.h"
+#include "effect_modules/SampleSkew.h"
 
 //==============================================================================
 class DualityAudioProcessor final : public juce::AudioProcessor, public juce::ChangeListener

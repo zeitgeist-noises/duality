@@ -396,6 +396,10 @@ void DualityAudioProcessor::setEffect(juce::String effectType)
     {
         effect = new Delay();
     }
+    else if(effectType == EffectSlot::effectNames[4])
+    {
+        effect = new SampleSkew();
+    }
 }
 
 void DualityAudioProcessor::addTreeChild(juce::ValueTree &parent,

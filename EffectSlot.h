@@ -5,7 +5,7 @@
 class EffectSlot
 {
 public:
-    static inline const juce::StringArray effectNames = {"distortion", "noise convolution", "pad", "delay"};
+    static inline const juce::StringArray effectNames = {"distortion", "noise convolution", "pad", "delay", "sample skew"};
 
     EffectSlot();
     virtual ~EffectSlot() = default;

@@ -3,16 +3,20 @@
 #include <JuceHeader.h>
 #include "../EffectSlot.h"
 
-class Pad : public EffectSlot
+class SampleSkew : public EffectSlot
 {
 public:
     enum Parameters
     {
-        length
+        skew,
+        drywet
     };
 
-    Pad();
-    ~Pad() = default;
+    SampleSkew();
+    ~SampleSkew() = default;
     void apply(juce::AudioBuffer<float> &dry);
     juce::String getEffectName();
+
+private:
+    double skewFunc(double x);
 };
