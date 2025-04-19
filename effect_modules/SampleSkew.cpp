@@ -47,5 +47,5 @@ double SampleSkew::skewFunc(double x)
     if(a == 0.0)
         return 0.0;
     
-    return pow(x, -(a-1)/a);
+    return pow(x, a/(1-a));
 }
