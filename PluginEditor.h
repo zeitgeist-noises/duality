@@ -8,7 +8,8 @@
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
                                           public juce::FileDragAndDropTarget,
                                           public juce::Slider::Listener,
-                                          public juce::ComboBox::Listener
+                                          public juce::ComboBox::Listener,
+                                          public juce::ChangeListener
 {
 public:
     explicit DualityAudioProcessorEditor (DualityAudioProcessor&);
@@ -22,6 +23,7 @@ public:
     void filesDropped(const juce::StringArray &files, int x, int y);
     void sliderValueChanged(juce::Slider* slider) override;
     void comboBoxChanged(juce::ComboBox *box) override;
+    void changeListenerCallback(juce::ChangeBroadcaster *source) override;
     
 
 private:

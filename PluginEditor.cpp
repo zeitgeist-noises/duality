@@ -16,9 +16,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     // editor's size to whatever you need it to be.
     setSize (600, 615);
 
+    processorRef.addChangeListener(this);
     
-    
-
     //gui controls
     addAndMakeVisible(openButton);
     openButton.setColour(openButton.buttonColourId, highlightColour);
@@ -242,6 +241,7 @@ void DualityAudioProcessorEditor::playButtonClicked()
     openButton.setEnabled(false);
     stopButton.setEnabled(true);
     transformButton.setEnabled(false);
+    playButton.setEnabled(false);
 }
 
 void DualityAudioProcessorEditor::stopButtonClicked()
@@ -249,6 +249,7 @@ void DualityAudioProcessorEditor::stopButtonClicked()
     processorRef.changeState(DualityAudioProcessor::TransportState::Stopping);
     openButton.setEnabled(true);
     transformButton.setEnabled(true);
+    playButton.setEnabled(true);
 }
 
 void DualityAudioProcessorEditor::transformButtonClicked()
@@ -331,6 +332,16 @@ void DualityAudioProcessorEditor::comboBoxChanged(juce::ComboBox *box)
         effectSelected();
     else if(box == &modeList)
         modeSelected();
+}
+
+void DualityAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
+{
+    if(source == &processorRef)
+    {
+        openButton.setEnabled(true);
+        transformButton.setEnabled(true);
+        playButton.setEnabled(true);
+    }
 }
 
 bool DualityAudioProcessorEditor::isInterestedInFileDrag(const juce::StringArray &files)
