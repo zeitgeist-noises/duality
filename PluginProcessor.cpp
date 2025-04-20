@@ -170,10 +170,9 @@ juce::AudioProcessorEditor* DualityAudioProcessor::createEditor()
 //==============================================================================
 void DualityAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    /*
     juce::ValueTree stateTree = juce::ValueTree("duality_state");
-    juce::ValueTree parameters = juce::ValueTree("parameters");
-    stateTree.addChild(parameters, -1, nullptr);
+    //juce::ValueTree parameters = juce::ValueTree("parameters");
+    //stateTree.addChild(parameters, -1, nullptr);
 
     //serialize effect slot
     if(effect != nullptr)
@@ -182,21 +181,21 @@ void DualityAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
         stateTree.appendChild(effect->toValueTree(), nullptr);
     }
 
-    addTreeChild(parameters, "parameter", "transformMode", "+pi/2");
-
+    //addTreeChild(parameters, "parameter", "transformMode", transformMode);
+    //addTreeChild(parameters, "parameter", "transformOnly", transformOnly);
+    stateTree.setProperty("transformMode", transformMode, nullptr);
+    stateTree.setProperty("transformOnly", transformOnly, nullptr);
     auto xml = stateTree.createXml();
 
-    copyXmlToBinary(*xml, destData);*/
+    copyXmlToBinary(*xml, destData);
 }
 
 void DualityAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    /*
-    juce::File debugOut = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("debugOut.txt");
-    debugOut.appendText("setState reached\n");
-
     if(auto xml = getXmlFromBinary(data, sizeInBytes))
     {
+        juce::File debugOut = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("debugOut.txt");
+        debugOut.appendText(xml->toString());
         auto tree = juce::ValueTree::fromXml(*xml);
 
         if(tree.hasProperty("effectType"))
@@ -206,7 +205,8 @@ void DualityAudioProcessor::setStateInformation(const void* data, int sizeInByte
         }
 
         transformMode = tree["transformMode"];
-    }*/
+        transformOnly = tree["transformOnly"];
+    }
 }
 
 // MY STUFF
