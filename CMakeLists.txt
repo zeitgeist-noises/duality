@@ -72,6 +72,7 @@ target_sources(Duality
         PluginEditor.cpp
         PluginProcessor.cpp
         EffectSlot.cpp
+        ModeVisualizer.cpp
         effect_modules/Distortion.cpp
         effect_modules/NoiseConvolution.cpp
         effect_modules/Pad.cpp

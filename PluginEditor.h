@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "DragExportButton.h"
+#include "ModeVisualizer.h"
 
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
@@ -60,6 +61,7 @@ private:
     juce::ComboBox modeList;
     void modeSelected();
     const juce::StringArray modeNames = {"flip f=t", "flip f=fmax-t", "+pi/2", "-pi/2", "+pi"};
+    ModeVisualizer modeUI;
 
     juce::Label sourceLabel;
     juce::Label transformLabel;
@@ -81,7 +83,7 @@ private:
     //globals
     const juce::Colour bgColour = juce::Colours::black;
     const juce::Colour drawColour = juce::Colours::whitesmoke;
-    const juce::Colour highlightColour = juce::Colours::blueviolet;
+    const juce::Colour highlightColour = juce::Colours::grey;
     const int margin = 20;
 
 

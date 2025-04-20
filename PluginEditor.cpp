@@ -70,6 +70,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     modeList.setColour(juce::ComboBox::ColourIds::arrowColourId, bgColour);
     modeList.addListener(this);
 
+    modeUI.setMode(processorRef.transformMode);
+
     //region labels
     juce::Font labelFont(juce::FontOptions(juce::Font::getDefaultMonospacedFontName(), 20, Font::bold));
 
@@ -161,20 +163,27 @@ void DualityAudioProcessorEditor::paint (juce::Graphics& g)
 
         //paint source thumbnail
     juce::Rectangle<int> waveformRect (200, margin+35, 410-2*margin, 100);
+    g.setColour(juce::Colours::white);
     if(sourceWaveform.getNumChannels() == 0)
         g.drawFittedText("empty file", waveformRect, juce::Justification::centred, 1);
     else
         sourceWaveform.drawChannels(g, waveformRect, 0.0, sourceWaveform.getTotalLength(), 1.0f);
-
+        
     //transform box
+    g.setColour(highlightColour);
     g.drawRect(juce::Rectangle<int>(margin, 190+margin, getWidth() - 2*margin, 220), stroke);
     g.drawLine(juce::Line<float>(getWidth()/2.0f, 175.0f+2*margin, getWidth()/2.0f, 386.0f+2*margin), stroke);
+
+    g.setColour(drawColour);
+    modeUI.draw(g);
+    g.setColour(highlightColour);
 
     //output box
     g.drawRect(juce::Rectangle<int>(margin, 455+margin, getWidth() - 2*margin, 120), stroke);
 
         //paint transformed wavefrom
     waveformRect = juce::Rectangle<int>(200, 465+margin, 410-2*margin, 100);
+    g.setColour(drawColour);
     if(transformedWaveform.getNumChannels() == 0)
         g.drawFittedText("empty file", waveformRect, juce::Justification::centred, 1);
     else
@@ -307,6 +316,8 @@ void DualityAudioProcessorEditor::effectSelected()
 void DualityAudioProcessorEditor::modeSelected()
 {
     processorRef.transformMode = modeList.getText();
+    modeUI.setMode(processorRef.transformMode);
+    repaint();
 }
 
 void DualityAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
