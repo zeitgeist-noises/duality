@@ -171,20 +171,16 @@ juce::AudioProcessorEditor* DualityAudioProcessor::createEditor()
 void DualityAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     juce::ValueTree stateTree = juce::ValueTree("duality_state");
-    //juce::ValueTree parameters = juce::ValueTree("parameters");
-    //stateTree.addChild(parameters, -1, nullptr);
 
     //serialize effect slot
     if(effect != nullptr)
     {
-        stateTree.setProperty("effectType", effect->getEffectName(), nullptr);
+        addTreeChild(stateTree, "effectType", "effectType", effect->getEffectName());
         stateTree.appendChild(effect->toValueTree(), nullptr);
     }
 
-    //addTreeChild(parameters, "parameter", "transformMode", transformMode);
-    //addTreeChild(parameters, "parameter", "transformOnly", transformOnly);
-    stateTree.setProperty("transformMode", transformMode, nullptr);
-    stateTree.setProperty("transformOnly", transformOnly, nullptr);
+    addTreeChild(stateTree, "transformMode", "transformMode", transformMode);
+    addTreeChild(stateTree, "transformOnly", "transformOnly", transformOnly);
     auto xml = stateTree.createXml();
 
     copyXmlToBinary(*xml, destData);
@@ -194,18 +190,13 @@ void DualityAudioProcessor::setStateInformation(const void* data, int sizeInByte
 {
     if(auto xml = getXmlFromBinary(data, sizeInBytes))
     {
-        juce::File debugOut = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("debugOut.txt");
-        debugOut.appendText(xml->toString());
         auto tree = juce::ValueTree::fromXml(*xml);
 
-        if(tree.hasProperty("effectType"))
-        {
-            setEffect(tree["effectType"]);
-            effect->fromValueTree(tree.getChildWithName("effectParams"));
-        }
+        setEffect(tree.getChildWithName("effectType").getProperty("effectType"));
+        effect->fromValueTree(tree.getChildWithName("effectParams"));
 
-        transformMode = tree["transformMode"];
-        transformOnly = tree["transformOnly"];
+        transformMode = tree.getChildWithName("transformMode").getProperty("transformMode");
+        transformOnly = tree.getChildWithName("transformOnly").getProperty("transformOnly");
     }
 }
 

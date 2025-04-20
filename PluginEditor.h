@@ -86,6 +86,8 @@ private:
     const juce::Colour highlightColour = juce::Colours::grey;
     const int margin = 20;
 
+    bool isFirstLoad;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualityAudioProcessorEditor)
 };

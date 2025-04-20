@@ -11,10 +11,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sliders(4),
         sliderLabels(4)
 {
-    //juce::ignoreUnused (processorRef);
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
     setSize (600, 615);
+    isFirstLoad = true;
 
     processorRef.addChangeListener(this);
     
@@ -54,6 +52,7 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     transformOnlyToggle.setColour(transformOnlyToggle.tickDisabledColourId, highlightColour);
     transformOnlyToggle.setButtonText("tranform\nonly");
     transformOnlyToggle.onClick = [this]{toggleClicked();};
+    transformOnlyToggle.setToggleState(processorRef.transformOnly, juce::NotificationType::dontSendNotification);
 
     addAndMakeVisible(saveButton);
     saveButton.setColour(saveButton.buttonColourId, highlightColour);
@@ -340,7 +339,11 @@ void DualityAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
 void DualityAudioProcessorEditor::comboBoxChanged(juce::ComboBox *box)
 {
     if(box == &effectList)
-        effectSelected();
+    {
+        if(!isFirstLoad)
+            effectSelected();
+        isFirstLoad = false;
+    }
     else if(box == &modeList)
         modeSelected();
 }
