@@ -3,13 +3,16 @@
 SampleSkew::SampleSkew()
 {
     parameterNames = {"skew", "dry/wet", "", ""};
-    parameters = {0.5f, 1.0f, 1.0f, 1.0f};
-    parameterRanges = {{0.0, 1.0}, {0.0, 1.0}, {0.0, 1.0}, {0.0, 1.0}};
-    parameterSkews = {1.0, 1.0, 1.0, 1.0};
+    parameterDefaults = {0.5f, 1.0f, 1.0f, 1.0f};
+    parameterRanges = {{0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}};
+    parameterSkews = {1.0f, 1.0f, 1.0f, 1.0f};
 }
 
-void SampleSkew::apply(juce::AudioBuffer<float> &dry)
+void SampleSkew::apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters)
 {
+    float skew = parameters[SampleSkew::skew];
+    float drywet = parameters[SampleSkew::drywet];
+
     int numSamples = dry.getNumSamples();
     int numChannels = dry.getNumChannels();
     AudioBuffer<float> wet (numChannels, numSamples);
@@ -22,15 +25,15 @@ void SampleSkew::apply(juce::AudioBuffer<float> &dry)
         for(int sample = 0; sample < numSamples; sample++)
         {
             double position = static_cast<double>(sample) / numSamples;
-            int newSample = static_cast<int>(numSamples*skewFunc(position));
+            int newSample = static_cast<int>(numSamples*remap(position, skew));
 
             *(wetBuffer + sample) = *(dryBuffer + newSample);
         }
     }
 
     //dry wet
-    dry.applyGain(1.0f - parameters[SampleSkew::drywet]);
-    wet.applyGain(parameters[SampleSkew::drywet]);
+    dry.applyGain(1.0f - drywet);
+    wet.applyGain(drywet);
 
     for(int channel = 0; channel < dry.getNumChannels(); channel++)
         dry.addFrom(channel, 0, wet, channel, 0, numSamples);
@@ -41,9 +44,9 @@ juce::String SampleSkew::getEffectName()
     return EffectSlot::effectNames[4];
 }
 
-double SampleSkew::skewFunc(double x)
+double SampleSkew::remap(double x, double skew)
 {
-    double a = static_cast<double>(parameters[SampleSkew::skew]);
+    double a = static_cast<double>(skew);
     if(a == 0.0)
         return 0.0;
     

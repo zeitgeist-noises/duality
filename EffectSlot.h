@@ -9,18 +9,17 @@ public:
 
     EffectSlot();
     virtual ~EffectSlot() = default;
-    virtual void apply(juce::AudioBuffer<float> &dry) = 0;
+    virtual void apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters) = 0;
     static void setSampleRate(double sr);
 
-    std::vector<float> parameters;
+    std::vector<float> parameterDefaults;
     std::vector<juce::String> parameterNames;
-    std::vector<std::vector<double>> parameterRanges;
-    std::vector<double> parameterSkews;
+    std::vector<std::vector<float>> parameterRanges;
+    std::vector<float> parameterSkews;
 
-    //serialization
-    juce::ValueTree toValueTree();
-    void fromValueTree(const juce::ValueTree& paramTree);
     virtual juce::String getEffectName() = 0;
+
+    float skewFunction(float input, int index);
     
 protected:
     static inline double sampleRate = 0.0;

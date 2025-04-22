@@ -14,9 +14,9 @@ public:
 
     SampleSkew();
     ~SampleSkew() = default;
-    void apply(juce::AudioBuffer<float> &dry);
+    void apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters);
     juce::String getEffectName();
 
 private:
-    double skewFunc(double x);
+    double remap(double x, double skew);
 };

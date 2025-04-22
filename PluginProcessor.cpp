@@ -10,12 +10,13 @@ DualityAudioProcessor::DualityAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+                       effectParameters(4),
+                       apvts(*this, nullptr, "Parameters", createParameterLayout())                      
 {
     formatManager.registerBasicFormats();
     transportSource.addChangeListener(this);
-    effect = new Distortion();
-    transformMode = "flip f=t";
+    loadParameters();
 }
 
 DualityAudioProcessor::~DualityAudioProcessor()
@@ -170,34 +171,35 @@ juce::AudioProcessorEditor* DualityAudioProcessor::createEditor()
 //==============================================================================
 void DualityAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    juce::ValueTree stateTree = juce::ValueTree("duality_state");
-
-    //serialize effect slot
-    if(effect != nullptr)
-    {
-        addTreeChild(stateTree, "effectType", "effectType", effect->getEffectName());
-        stateTree.appendChild(effect->toValueTree(), nullptr);
-    }
-
-    addTreeChild(stateTree, "transformMode", "transformMode", transformMode);
-    addTreeChild(stateTree, "transformOnly", "transformOnly", transformOnly);
-    auto xml = stateTree.createXml();
-
-    copyXmlToBinary(*xml, destData);
+    juce::MemoryOutputStream mos (destData, true);
+    apvts.state.writeToStream(mos);
 }
 
 void DualityAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    if(auto xml = getXmlFromBinary(data, sizeInBytes))
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if(tree.isValid())
     {
-        auto tree = juce::ValueTree::fromXml(*xml);
-
-        setEffect(tree.getChildWithName("effectType").getProperty("effectType"));
-        effect->fromValueTree(tree.getChildWithName("effectParams"));
-
-        transformMode = tree.getChildWithName("transformMode").getProperty("transformMode");
-        transformOnly = tree.getChildWithName("transformOnly").getProperty("transformOnly");
+        apvts.replaceState(tree);
+        loadParameters();
     }
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout DualityAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    layout.add(std::make_unique<juce::AudioParameterChoice>("mode", "mode", modeNames, 0));
+    layout.add(std::make_unique<juce::AudioParameterBool>("transformOnly", "transformOnly", false));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("effect", "effect", EffectSlot::effectNames, 0));
+
+    for(int i = 0; i < effectParameters.size(); i++)
+    {
+        juce::String name = "param_" + std::to_string(i);
+        layout.add(std::make_unique<juce::AudioParameterFloat>(name, name, 0.0f, 1.0f, 0.0f));
+    }
+
+    return layout;
 }
 
 // MY STUFF
@@ -253,6 +255,8 @@ void DualityAudioProcessor::changeListenerCallback(juce::ChangeBroadcaster *sour
 
 void DualityAudioProcessor::process(const juce::File &inputFile, juce::File &transformedFile)
 {
+    loadParameters();
+
     juce::AudioFormatReader* reader = formatManager.createReaderFor(inputFile);
     juce::AudioBuffer<float> data = juce::AudioBuffer<float>(reader->numChannels, static_cast<int>(reader->lengthInSamples));
     juce::File outputFile = juce::File::createTempFile(".wav");
@@ -377,7 +381,7 @@ void DualityAudioProcessor::setEffect(juce::String effectType)
 {    
     if(effect != nullptr)
         delete effect;
-    
+
     if(effectType == EffectSlot::effectNames[0])
     {
         effect = new Distortion();
@@ -398,6 +402,12 @@ void DualityAudioProcessor::setEffect(juce::String effectType)
     {
         effect = new SampleSkew();
     }
+
+    for(int i = 0; i < effectParameters.size(); i++)
+    {
+        juce::String name = "param_" + std::to_string(i);
+        apvts.getParameter(name)->setValue(effect->parameterDefaults[i]);
+    }
 }
 
 void DualityAudioProcessor::addTreeChild(juce::ValueTree &parent,
@@ -410,10 +420,23 @@ void DualityAudioProcessor::addTreeChild(juce::ValueTree &parent,
     parent.addChild(child, -1, nullptr);
 }
 
+void DualityAudioProcessor::loadParameters()
+{
+    setEffect(EffectSlot::effectNames[(int)*apvts.getRawParameterValue("effect")]);
+    transformMode = modeNames[(int)*apvts.getRawParameterValue("mode")];
+    transformOnly = *apvts.getRawParameterValue("transformOnly");
+
+    for(int i = 0; i < effectParameters.size(); i++)
+    {
+        juce::String name = "param_" + std::to_string(i);
+        effectParameters[i] = *apvts.getRawParameterValue(name);
+    }
+}
+
 void DualityAudioProcessor::applyEffects(juce::AudioBuffer<float> &data)
 {
     if(effect != nullptr)
-        effect->apply(data);
+        effect->apply(data, effectParameters);
 }
 
 //==============================================================================

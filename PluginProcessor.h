@@ -57,27 +57,35 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-
     //MY STUFF
+    const juce::StringArray modeNames = {"flip f=t", "flip f=fmax-t", "+pi/2", "-pi/2", "+pi"};
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
     void changeState(TransportState newState);
     void loadFile(juce::File &filename);
     void process(const juce::File &inputFile, juce::File &transformedFile);
 
-    EffectSlot *effect;
+    EffectSlot *effect = nullptr;
     void setEffect(juce::String effectType);
 
+    std::vector<float> effectParameters;
+
     juce::String transformMode;
-    bool transformOnly = false;
+    bool transformOnly;
 
     void addTreeChild(juce::ValueTree &parent,
                         const juce::Identifier &childType,
                         const juce::Identifier &propertyName,
                         const juce::var &propertyValue);
 
+    juce::AudioProcessorValueTreeState apvts;
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualityAudioProcessor)
     //MY STUFF
+    void loadParameters();
+
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;

@@ -3,14 +3,16 @@
 Pad::Pad()
 {
     parameterNames = {"length", "", "", ""};
-    parameters = {1.0f, 1.0f, 1.0f, 1.0f};
-    parameterRanges = {{0.0, 10.0}, {0.0, 1.0}, {0.0, 1.0}, {0.0, 1.0}};
-    parameterSkews = {1.0, 1.0, 1.0, 1.0};
+    parameterDefaults = {1.0f, 1.0f, 1.0f, 1.0f};
+    parameterRanges = {{0.0f, 10.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}};
+    parameterSkews = {1.0f, 1.0f, 1.0f, 1.0f};
 }
 
-void Pad::apply(juce::AudioBuffer<float> &dry)
+void Pad::apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters)
 {
-    int new_length = static_cast<int>(dry.getNumSamples()*parameters[Pad::length]);
+    float length = skewFunction(parameters[Pad::length], Pad::length);
+
+    int new_length = static_cast<int>(dry.getNumSamples()*length);
     dry.setSize(dry.getNumChannels(), new_length, true, true);
 }
 

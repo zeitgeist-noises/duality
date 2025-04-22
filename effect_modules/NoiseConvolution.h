@@ -19,9 +19,9 @@ public:
 
     NoiseConvolution();
     ~NoiseConvolution() = default;
-    void apply(juce::AudioBuffer<float> &dry);
+    void apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters);
     juce::String getEffectName();
 
 private:
-    juce::AudioBuffer<float> createIR(int numSamples);
+    juce::AudioBuffer<float> createIR(int numSamples, float order);
 };

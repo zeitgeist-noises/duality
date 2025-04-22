@@ -3,18 +3,23 @@
 NoiseConvolution::NoiseConvolution()
 {
     parameterNames = {"decay", "order", "width", "dry/wet"};
-    parameters = {0.01f, 10.0f, 1.0f, 1.0f};
-    parameterRanges = {{0.0, 1.0}, {0.0, 100.0}, {0.0, 1.0}, {0.0, 1.0}};
-    parameterSkews = {0.2, 0.5, 1.0, 1.0};
+    parameterDefaults = {0.01f, 10.0f, 1.0f, 1.0f};
+    parameterRanges = {{0.0f, 1.0f}, {0.0f, 100.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}};
+    parameterSkews = {0.2f, 0.5f, 1.0f, 1.0f};
 }
 
-void NoiseConvolution::apply(juce::AudioBuffer<float> &dry)
+void NoiseConvolution::apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters)
 {   
+    float decay = skewFunction(parameters[NoiseConvolution::decay], NoiseConvolution::decay);
+    float order = skewFunction(parameters[NoiseConvolution::order], NoiseConvolution::order);
+    float width = parameters[NoiseConvolution::width];
+    float drywet = parameters[NoiseConvolution::drywet];
+
     juce::AudioBuffer<float> wet (dry);
     const int numSamples = wet.getNumSamples();
 
     //perform convolution
-    juce::AudioBuffer<float> ir = createIR(static_cast<int>(std::floor(parameters[NoiseConvolution::decay] * numSamples)));
+    juce::AudioBuffer<float> ir = createIR(static_cast<int>(std::floor(decay * numSamples)), order);
 
     juce::dsp::Convolution conv;
     conv.loadImpulseResponse(std::move(ir),
@@ -31,7 +36,6 @@ void NoiseConvolution::apply(juce::AudioBuffer<float> &dry)
     conv.process(context);
 
     //width
-    float width = parameters[NoiseConvolution::width];
     float *left = wet.getWritePointer(0);
     float *right = left;
     if(wet.getNumChannels() > 1)
@@ -47,8 +51,8 @@ void NoiseConvolution::apply(juce::AudioBuffer<float> &dry)
     }
     
     //dry wet
-    dry.applyGain(1.0f - parameters[NoiseConvolution::drywet]);
-    wet.applyGain(parameters[NoiseConvolution::drywet] / wet.getMagnitude(0, numSamples));
+    dry.applyGain(1.0f - drywet);
+    wet.applyGain(drywet / wet.getMagnitude(0, numSamples));
 
 
     for(int channel = 0; channel < dry.getNumChannels(); channel++)
@@ -56,7 +60,7 @@ void NoiseConvolution::apply(juce::AudioBuffer<float> &dry)
 
 }
 
-juce::AudioBuffer<float> NoiseConvolution::createIR(int numSamples)
+juce::AudioBuffer<float> NoiseConvolution::createIR(int numSamples, float order)
 {
     juce::AudioBuffer<float> ir(2, numSamples);
     std::mt19937 mt(static_cast<unsigned int>(std::time(nullptr)));
@@ -67,7 +71,7 @@ juce::AudioBuffer<float> NoiseConvolution::createIR(int numSamples)
         float *write = ir.getWritePointer(channel);
         for(int i = 0; i < numSamples; i++)
         {
-            *(write + i) = gaussian(mt) * pow(static_cast<float>(numSamples-i)/numSamples, parameters[NoiseConvolution::order]);
+            *(write + i) = gaussian(mt) * pow(static_cast<float>(numSamples-i)/numSamples, order);
         }
     }
     
@@ -78,3 +82,4 @@ juce::String NoiseConvolution::getEffectName()
 {
     return EffectSlot::effectNames[1];
 }
+

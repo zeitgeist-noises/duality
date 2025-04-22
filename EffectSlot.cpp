@@ -10,30 +10,7 @@ void EffectSlot::setSampleRate(double sr)
     sampleRate = sr;
 }
 
-juce::ValueTree EffectSlot::toValueTree()
+float EffectSlot::skewFunction(float input, int index)
 {
-    juce::ValueTree paramTree = juce::ValueTree("effectParams");
-
-    for(int i = 0; i < parameters.size(); i++)
-    {
-        paramTree.setProperty(juce::Identifier("parameter_" + std::to_string(i)), parameters[i], nullptr);
-        paramTree.setProperty(juce::Identifier("parameterName_" + std::to_string(i)), parameterNames[i], nullptr);
-        paramTree.setProperty(juce::Identifier("parameterRangeLow_" + std::to_string(i)), parameterRanges[i][0], nullptr);
-        paramTree.setProperty(juce::Identifier("parameterRangeHigh_" + std::to_string(i)), parameterRanges[i][1], nullptr);
-        paramTree.setProperty(juce::Identifier("parameterSkew_" + std::to_string(i)), parameterSkews[i], nullptr);
-    }
-
-    return paramTree;
-}
-
-void EffectSlot::fromValueTree(const juce::ValueTree &paramTree)
-{
-    for(int i = 0; i < parameters.size(); i++)
-    {
-        parameters[i] = paramTree.getProperty(juce::Identifier("parameter_" + std::to_string(i)));
-        parameterNames[i] = paramTree.getProperty(juce::Identifier("parameterName_" + std::to_string(i)));
-        parameterRanges[i][0] = paramTree.getProperty(juce::Identifier("parameterRangeLow_" + std::to_string(i)));
-        parameterRanges[i][1] = paramTree.getProperty(juce::Identifier("parameterRangeHigh_" + std::to_string(i)));
-        parameterSkews[i] = paramTree.getProperty(juce::Identifier("parameterSkew_" + std::to_string(i)));
-    }
+    return parameterRanges[index][0] + (parameterRanges[index][1] - parameterRanges[index][0])*pow(input, parameterSkews[index]);
 }

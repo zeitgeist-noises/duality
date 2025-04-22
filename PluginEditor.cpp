@@ -9,10 +9,16 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sourceWaveform(512, formatManager, thumbnailCache),
         transformedWaveform(512, formatManager, thumbnailCache),
         sliders(4),
-        sliderLabels(4)
+        sliderLabels(4),
+        transformOnlyAttachment(processorRef.apvts, "transformOnly", transformOnlyToggle),
+        effectAttachment(processorRef.apvts, "effect", effectList),
+        modeAttachment(processorRef.apvts, "mode", modeList),
+        sliderAttachment0(processorRef.apvts, "param_0", sliders[0]),
+        sliderAttachment1(processorRef.apvts, "param_1", sliders[1]),
+        sliderAttachment2(processorRef.apvts, "param_2", sliders[2]),
+        sliderAttachment3(processorRef.apvts, "param_3", sliders[3])
 {
     setSize (600, 615);
-    isFirstLoad = true;
 
     processorRef.addChangeListener(this);
     
@@ -52,7 +58,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     transformOnlyToggle.setColour(transformOnlyToggle.tickDisabledColourId, highlightColour);
     transformOnlyToggle.setButtonText("tranform\nonly");
     transformOnlyToggle.onClick = [this]{toggleClicked();};
-    transformOnlyToggle.setToggleState(processorRef.transformOnly, juce::NotificationType::dontSendNotification);
 
     addAndMakeVisible(saveButton);
     saveButton.setColour(saveButton.buttonColourId, highlightColour);
@@ -62,12 +67,12 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     saveButton.onClick = [this]{saveButtonClicked();};
 
     addAndMakeVisible(modeList);
-    modeList.addItemList(modeNames, 1);
+    modeList.addItemList(processorRef.modeNames, 1);
     modeList.setText(processorRef.transformMode);
     modeList.setColour(juce::ComboBox::ColourIds::backgroundColourId, highlightColour);
     modeList.setColour(juce::ComboBox::ColourIds::textColourId, bgColour);
     modeList.setColour(juce::ComboBox::ColourIds::arrowColourId, bgColour);
-    modeList.addListener(this);
+    modeList.onChange = [this]{modeSelected();};
 
     modeUI.setMode(processorRef.transformMode);
 
@@ -104,11 +109,9 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     effectList.setColour(juce::ComboBox::ColourIds::backgroundColourId, highlightColour);
     effectList.setColour(juce::ComboBox::ColourIds::textColourId, bgColour);
     effectList.setColour(juce::ComboBox::ColourIds::arrowColourId, bgColour);
-    effectList.addListener(this);
+    effectList.onChange = [this]{effectSelected();};
 
-    //sliders and their labels
-    EffectSlot *e = processorRef.effect;
-    
+    //sliders and their labels    
     for(int i = 0; i < sliders.size(); i++)
     {
         addAndMakeVisible(sliders[i]);
@@ -118,13 +121,7 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         
         addAndMakeVisible(sliderLabels[i]);
         sliderLabels[i].attachToComponent(&sliders[i], true);
-
-        sliderLabels[i].setText(e->parameterNames[i], juce::NotificationType::dontSendNotification);
-        sliders[i].setRange(e->parameterRanges[i][0], e->parameterRanges[i][1]);
-        sliders[i].setSkewFactor(e->parameterSkews[i]);
-        sliders[i].setValue(e->parameters[i]);
-
-        sliders[i].addListener(this);
+        sliderLabels[i].setText(processorRef.effect->parameterNames[i], juce::NotificationType::dontSendNotification);
     }
 
     //files
@@ -306,9 +303,6 @@ void DualityAudioProcessorEditor::effectSelected()
     for(int i = 0; i < sliderLabels.size(); i++)
     {
         sliderLabels[i].setText(e->parameterNames[i], juce::NotificationType::dontSendNotification);
-        sliders[i].setRange(e->parameterRanges[i][0], e->parameterRanges[i][1]);
-        sliders[i].setSkewFactor(e->parameterSkews[i]);
-        sliders[i].setValue(e->parameters[i]);
     }
 }
 
@@ -317,35 +311,6 @@ void DualityAudioProcessorEditor::modeSelected()
     processorRef.transformMode = modeList.getText();
     modeUI.setMode(processorRef.transformMode);
     repaint();
-}
-
-void DualityAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
-{
-    if(processorRef.effect == nullptr)
-        return;
-    
-    float sliderValue = static_cast<float>(slider->getValue());
-    if(slider == &sliders[0])
-        processorRef.effect->parameters[0] = sliderValue;
-    else if(slider == &sliders[1])
-        processorRef.effect->parameters[1] = sliderValue;
-    else if(slider == &sliders[2])
-        processorRef.effect->parameters[2] = sliderValue;
-    else if(slider == &sliders[3])
-        processorRef.effect->parameters[3] = sliderValue;
-
-}
-
-void DualityAudioProcessorEditor::comboBoxChanged(juce::ComboBox *box)
-{
-    if(box == &effectList)
-    {
-        if(!isFirstLoad)
-            effectSelected();
-        isFirstLoad = false;
-    }
-    else if(box == &modeList)
-        modeSelected();
 }
 
 void DualityAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)

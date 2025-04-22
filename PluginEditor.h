@@ -8,8 +8,6 @@
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
                                           public juce::FileDragAndDropTarget,
-                                          public juce::Slider::Listener,
-                                          public juce::ComboBox::Listener,
                                           public juce::ChangeListener
 {
 public:
@@ -22,8 +20,6 @@ public:
 
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
     void filesDropped(const juce::StringArray &files, int x, int y);
-    void sliderValueChanged(juce::Slider* slider) override;
-    void comboBoxChanged(juce::ComboBox *box) override;
     void changeListenerCallback(juce::ChangeBroadcaster *source) override;
     
 
@@ -47,6 +43,7 @@ private:
     void transformButtonClicked();
 
     juce::ToggleButton transformOnlyToggle;
+    juce::AudioProcessorValueTreeState::ButtonAttachment transformOnlyAttachment;
     void toggleClicked();
 
     juce::TextButton saveButton;
@@ -54,13 +51,18 @@ private:
 
     std::vector<juce::Slider> sliders;
     std::vector<juce::Label> sliderLabels;
+    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment0;
+    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment1;
+    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment2;
+    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment3;
 
     juce::ComboBox effectList;
+    juce::AudioProcessorValueTreeState::ComboBoxAttachment effectAttachment;
     void effectSelected();
 
     juce::ComboBox modeList;
+    juce::AudioProcessorValueTreeState::ComboBoxAttachment modeAttachment;
     void modeSelected();
-    const juce::StringArray modeNames = {"flip f=t", "flip f=fmax-t", "+pi/2", "-pi/2", "+pi"};
     ModeVisualizer modeUI;
 
     juce::Label sourceLabel;
@@ -85,8 +87,6 @@ private:
     const juce::Colour drawColour = juce::Colours::whitesmoke;
     const juce::Colour highlightColour = juce::Colours::grey;
     const int margin = 20;
-
-    bool isFirstLoad;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DualityAudioProcessorEditor)

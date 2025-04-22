@@ -14,6 +14,6 @@ public:
 
     Distortion();
     ~Distortion() = default;
-    void apply(juce::AudioBuffer<float> &dry);
+    void apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters);
     juce::String getEffectName();
 };
