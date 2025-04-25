@@ -5,7 +5,7 @@ NoiseConvolution::NoiseConvolution()
     parameterNames = {"decay", "order", "width", "dry/wet"};
     parameterDefaults = {0.01f, 10.0f, 1.0f, 1.0f};
     parameterRanges = {{0.0f, 1.0f}, {0.0f, 100.0f}, {0.0f, 1.0f}, {0.0f, 1.0f}};
-    parameterSkews = {0.2f, 0.5f, 1.0f, 1.0f};
+    parameterSkews = {0.3f, 0.6f, 1.0f, 1.0f};
 }
 
 void NoiseConvolution::apply(juce::AudioBuffer<float> &dry, std::vector<float> parameters)

@@ -16,6 +16,8 @@ DualityAudioProcessor::DualityAudioProcessor()
 {
     formatManager.registerBasicFormats();
     transportSource.addChangeListener(this);
+    effect = new Distortion();
+    transformMode = "flip f=t";
 }
 
 DualityAudioProcessor::~DualityAudioProcessor()

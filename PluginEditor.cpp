@@ -299,6 +299,7 @@ void DualityAudioProcessorEditor::handleSliders()
     {
         sliders[i].range = e->parameterRanges[i];
         sliders[i].skew = e->parameterSkews[i];
+        sliders[i].updateText();
         sliderLabels[i].setText(e->parameterNames[i], juce::NotificationType::dontSendNotification);
     }
 }
