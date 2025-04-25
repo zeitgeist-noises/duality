@@ -121,8 +121,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         
         addAndMakeVisible(sliderLabels[i]);
         sliderLabels[i].attachToComponent(&sliders[i], true);
-        sliderLabels[i].setText(processorRef.effect->parameterNames[i], juce::NotificationType::dontSendNotification);
     }
+    handleSliders();
 
     //files
     formatManager.registerBasicFormats();
@@ -292,18 +292,28 @@ void DualityAudioProcessorEditor::saveButtonClicked()
     });
 }
 
-void DualityAudioProcessorEditor::effectSelected()
+void DualityAudioProcessorEditor::handleSliders()
 {
-    processorRef.setEffect(effectList.getText());
-
     EffectSlot *e = processorRef.effect;
-    if(e == nullptr)
-        return;
-    
     for(int i = 0; i < sliderLabels.size(); i++)
     {
+        sliders[i].range = e->parameterRanges[i];
+        sliders[i].skew = e->parameterSkews[i];
         sliderLabels[i].setText(e->parameterNames[i], juce::NotificationType::dontSendNotification);
     }
+}
+
+void DualityAudioProcessorEditor::effectSelected()
+{
+    if(!isFirstLoad)
+    {
+        processorRef.setEffect(effectList.getText());
+        processorRef.loadDefaultParameters();
+        
+        handleSliders();
+    }
+    
+    isFirstLoad = false;
 }
 
 void DualityAudioProcessorEditor::modeSelected()

@@ -20,6 +20,7 @@ public:
     virtual juce::String getEffectName() = 0;
 
     float skewFunction(float input, int index);
+    float invSkew(float input, int index);
     
 protected:
     static inline double sampleRate = 0.0;

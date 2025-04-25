@@ -67,6 +67,7 @@ public:
 
     EffectSlot *effect = nullptr;
     void setEffect(juce::String effectType);
+    void loadDefaultParameters();
 
     std::vector<float> effectParameters;
 

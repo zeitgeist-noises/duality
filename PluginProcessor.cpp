@@ -16,7 +16,6 @@ DualityAudioProcessor::DualityAudioProcessor()
 {
     formatManager.registerBasicFormats();
     transportSource.addChangeListener(this);
-    loadParameters();
 }
 
 DualityAudioProcessor::~DualityAudioProcessor()
@@ -181,7 +180,12 @@ void DualityAudioProcessor::setStateInformation(const void* data, int sizeInByte
     if(tree.isValid())
     {
         apvts.replaceState(tree);
+        setEffect(EffectSlot::effectNames[(int)*apvts.getRawParameterValue("effect")]);
         loadParameters();
+    }
+    else
+    {
+        loadDefaultParameters();
     }
 }
 
@@ -195,7 +199,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout DualityAudioProcessor::creat
 
     for(int i = 0; i < effectParameters.size(); i++)
     {
-        juce::String name = "param_" + std::to_string(i);
+        juce::String name ("param_" + std::to_string(i));
         layout.add(std::make_unique<juce::AudioParameterFloat>(name, name, 0.0f, 1.0f, 0.0f));
     }
 
@@ -402,11 +406,15 @@ void DualityAudioProcessor::setEffect(juce::String effectType)
     {
         effect = new SampleSkew();
     }
+}
 
+void DualityAudioProcessor::loadDefaultParameters()
+{
     for(int i = 0; i < effectParameters.size(); i++)
     {
-        juce::String name = "param_" + std::to_string(i);
-        apvts.getParameter(name)->setValue(effect->parameterDefaults[i]);
+        juce::String name ("param_" + std::to_string(i));
+        float value = effect->invSkew(effect->parameterDefaults[i], i);
+        apvts.getParameter(name)->setValueNotifyingHost(value);
     }
 }
 
@@ -422,13 +430,12 @@ void DualityAudioProcessor::addTreeChild(juce::ValueTree &parent,
 
 void DualityAudioProcessor::loadParameters()
 {
-    setEffect(EffectSlot::effectNames[(int)*apvts.getRawParameterValue("effect")]);
     transformMode = modeNames[(int)*apvts.getRawParameterValue("mode")];
     transformOnly = *apvts.getRawParameterValue("transformOnly");
 
     for(int i = 0; i < effectParameters.size(); i++)
     {
-        juce::String name = "param_" + std::to_string(i);
+        juce::String name ("param_" + std::to_string(i));
         effectParameters[i] = *apvts.getRawParameterValue(name);
     }
 }

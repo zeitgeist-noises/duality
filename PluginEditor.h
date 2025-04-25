@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 #include "DragExportButton.h"
 #include "ModeVisualizer.h"
+#include "MySlider.h"
 
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
@@ -49,16 +50,18 @@ private:
     juce::TextButton saveButton;
     void saveButtonClicked();
 
-    std::vector<juce::Slider> sliders;
+    std::vector<MySlider> sliders;
     std::vector<juce::Label> sliderLabels;
     juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment0;
     juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment1;
     juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment2;
     juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment3;
+    void handleSliders();
 
     juce::ComboBox effectList;
     juce::AudioProcessorValueTreeState::ComboBoxAttachment effectAttachment;
     void effectSelected();
+    bool isFirstLoad = true;
 
     juce::ComboBox modeList;
     juce::AudioProcessorValueTreeState::ComboBoxAttachment modeAttachment;
