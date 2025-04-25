@@ -9,7 +9,7 @@
 #include "effect_modules/SampleSkew.h"
 
 //==============================================================================
-class DualityAudioProcessor final : public juce::AudioProcessor, public juce::ChangeListener, public juce::ChangeBroadcaster
+class DualityAudioProcessor final : public juce::AudioProcessor, public juce::ChangeListener
 {
 public:
 

@@ -5,7 +5,7 @@
 DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor& p)
     :   AudioProcessorEditor (&p), 
         processorRef(p),
-        thumbnailCache(2),
+        thumbnailCache(4),
         sourceWaveform(512, formatManager, thumbnailCache),
         transformedWaveform(512, formatManager, thumbnailCache),
         sliders(4),
@@ -19,8 +19,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sliderAttachment3(processorRef.apvts, "param_3", sliders[3])
 {
     setSize (600, 615);
-
-    processorRef.addChangeListener(this);
     
     //gui controls
     addAndMakeVisible(openButton);
@@ -236,6 +234,7 @@ void DualityAudioProcessorEditor::openButtonClicked()
             chosen.copyFileTo(sourceFile);
             sourceFile.copyFileTo(transformedFile);
             loadFilesIntoEditor();
+            repaint();
         }
     });
 }
@@ -261,6 +260,7 @@ void DualityAudioProcessorEditor::transformButtonClicked()
 {
     processorRef.process(sourceFile, transformedFile);
     loadFilesIntoEditor();
+    repaint();
 }
 
 void DualityAudioProcessorEditor::toggleClicked()
@@ -324,16 +324,6 @@ void DualityAudioProcessorEditor::modeSelected()
     repaint();
 }
 
-void DualityAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
-{
-    if(source == &processorRef)
-    {
-        openButton.setEnabled(true);
-        transformButton.setEnabled(true);
-        playButton.setEnabled(true);
-    }
-}
-
 bool DualityAudioProcessorEditor::isInterestedInFileDrag(const juce::StringArray &files)
 {
     for(juce::String file : files)
@@ -358,6 +348,7 @@ void DualityAudioProcessorEditor::filesDropped(const juce::StringArray &files, i
             juce::File{file}.copyFileTo(sourceFile);
             sourceFile.copyFileTo(transformedFile);
             loadFilesIntoEditor();
+            repaint();
         }
     }
 }
@@ -366,8 +357,14 @@ void DualityAudioProcessorEditor::loadFilesIntoEditor()
 {
     processorRef.loadFile(transformedFile);
 
-    thumbnailCache.clear();
-    if(sourceWaveform.setSource(new juce::FileInputSource(sourceFile)) &&
-       transformedWaveform.setSource(new juce::FileInputSource(transformedFile)))
-        repaint();
+    /*bool source = */sourceWaveform.setSource(new juce::FileInputSource(sourceFile));
+    /*bool trans = */transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
+
+    repaint();
+
+    /*
+    juce::File debugOut = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("debugOut.txt");
+    debugOut.appendText(sourceFile.getFileName() + "\n");
+    debugOut.appendText("source: " + std::to_string(source) + "\n");
+    debugOut.appendText("trans: " + std::to_string(trans) + "\n\n");*/
 }

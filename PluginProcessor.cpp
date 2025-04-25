@@ -150,11 +150,6 @@ void DualityAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if(state == TransportState::Playing)
     {
         transportSource.getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
-        if(transportSource.hasStreamFinished())
-        {
-            changeState(TransportState::Stopped);
-            sendChangeMessage();
-        }
     }
 }
 
