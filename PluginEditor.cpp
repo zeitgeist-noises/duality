@@ -145,6 +145,8 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
 
 DualityAudioProcessorEditor::~DualityAudioProcessorEditor()
 {
+    sourceWaveform.removeAllChangeListeners();
+    transformedWaveform.removeAllChangeListeners();
 }
 
 //==============================================================================

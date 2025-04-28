@@ -23,6 +23,7 @@ DualityAudioProcessor::DualityAudioProcessor()
 DualityAudioProcessor::~DualityAudioProcessor()
 {
     delete effect;
+    transportSource.removeAllChangeListeners();
 }
 
 //==============================================================================
