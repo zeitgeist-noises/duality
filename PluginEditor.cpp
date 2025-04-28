@@ -18,6 +18,7 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sliderAttachment2(processorRef.apvts, "param_2", sliders[2]),
         sliderAttachment3(processorRef.apvts, "param_3", sliders[3])
 {
+    formatManager.registerBasicFormats();
     setSize (600, 615);
     
     //gui controls
@@ -123,7 +124,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     handleSliders();
 
     //files
-    formatManager.registerBasicFormats();
     juce::File appDataFolder = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory);
     juce::File subFolder = appDataFolder.getChildFile("duality");
     if(!subFolder.exists())
@@ -137,7 +137,10 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     if(!transformedFile.exists())
         transformedFile.create();
 
-    loadFilesIntoEditor();
+    sourceWaveform.addChangeListener(this);
+    transformedWaveform.addChangeListener(this);
+
+    juce::MessageManager::callAsync([this]{loadFilesIntoEditor();});
 }
 
 DualityAudioProcessorEditor::~DualityAudioProcessorEditor()
@@ -181,7 +184,7 @@ void DualityAudioProcessorEditor::paint (juce::Graphics& g)
     if(transformedWaveform.getNumChannels() == 0)
         g.drawFittedText("empty file", waveformRect, juce::Justification::centred, 1);
     else
-        transformedWaveform.drawChannels(g, waveformRect, 0.0, sourceWaveform.getTotalLength(), 1.0f);
+        transformedWaveform.drawChannels(g, waveformRect, 0.0, transformedWaveform.getTotalLength(), 1.0f);
 
 }
 
@@ -233,8 +236,7 @@ void DualityAudioProcessorEditor::openButtonClicked()
             //deal with audioSource
             chosen.copyFileTo(sourceFile);
             sourceFile.copyFileTo(transformedFile);
-            loadFilesIntoEditor();
-            repaint();
+            juce::MessageManager::callAsync ([this]{loadFilesIntoEditor();});
         }
     });
 }
@@ -260,7 +262,6 @@ void DualityAudioProcessorEditor::transformButtonClicked()
 {
     processorRef.process(sourceFile, transformedFile);
     loadFilesIntoEditor();
-    repaint();
 }
 
 void DualityAudioProcessorEditor::toggleClicked()
@@ -347,24 +348,25 @@ void DualityAudioProcessorEditor::filesDropped(const juce::StringArray &files, i
             //deal with source
             juce::File{file}.copyFileTo(sourceFile);
             sourceFile.copyFileTo(transformedFile);
-            loadFilesIntoEditor();
-            repaint();
+            juce::MessageManager::callAsync ([this]{loadFilesIntoEditor();});
         }
     }
+}
+
+void DualityAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
+{
+    ignoreUnused(source);
+    repaint();
 }
 
 void DualityAudioProcessorEditor::loadFilesIntoEditor()
 {
     processorRef.loadFile(transformedFile);
 
-    /*bool source = */sourceWaveform.setSource(new juce::FileInputSource(sourceFile));
-    /*bool trans = */transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
+    thumbnailCache.clear();
+    sourceWaveform.clear();
+    transformedWaveform.clear();
 
-    repaint();
-
-    /*
-    juce::File debugOut = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("debugOut.txt");
-    debugOut.appendText(sourceFile.getFileName() + "\n");
-    debugOut.appendText("source: " + std::to_string(source) + "\n");
-    debugOut.appendText("trans: " + std::to_string(trans) + "\n\n");*/
+    sourceWaveform.setSource(new juce::FileInputSource(sourceFile));
+    transformedWaveform.setSource(new juce::FileInputSource(transformedFile));
 }

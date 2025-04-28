@@ -8,7 +8,8 @@
 
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
-                                          public juce::FileDragAndDropTarget
+                                          public juce::FileDragAndDropTarget,
+                                          private juce::ChangeListener
 {
 public:
     explicit DualityAudioProcessorEditor (DualityAudioProcessor&);
@@ -20,6 +21,8 @@ public:
 
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
     void filesDropped(const juce::StringArray &files, int x, int y);
+
+    void changeListenerCallback (juce::ChangeBroadcaster* source) override;
     
 
 private:
