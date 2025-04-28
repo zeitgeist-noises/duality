@@ -10,17 +10,17 @@ The transform section lets you choose which spectral transformation you would li
 The effects section lets you choose which effect is used between the spectral transform and the corresponding inverse transform
 Here's a brief explanation of the available effects:
 
-    Distortion
-        This is simply a hard clipper with an input gain control (in dB) and a dry/wet control. Since normally distortion spreads a sound across the frequency domain, this will result in spreading the sound across the time domain when used in this plugin. It sounds a bit like reverb/delay and adds space
+ - Distortion
+This is simply a hard clipper with an input gain control (in dB) and a dry/wet control. Since normally distortion spreads a sound across the frequency domain, this will result in spreading the sound across the time domain when used in this plugin. It sounds a bit like reverb/delay and adds space
 
-    Noise Convolution
-        This generates an impulse response of white noise with the given volume envelope and convolves the sample. This is essentially a reverb. Since reverb normally spreads a sound across the time domain, in this plugin, it will spread a sound across the frequency domain. At high decays, this results in a sort of inharmonic/noisy distortion. At low decays, it results in a fast volume lfo (almost granular sound) since the interference "beating" of neighboring frequencies is pronounced.
+ - Noise Convolution
+This generates an impulse response of white noise with the given volume envelope and convolves the sample. This is essentially a reverb. Since reverb normally spreads a sound across the time domain, in this plugin, it will spread a sound across the frequency domain. At high decays, this results in a sort of inharmonic/noisy distortion. At low decays, it results in a fast volume lfo (almost granular sound) since the interference "beating" of neighboring frequencies is pronounced.
 
-        Parameters:
-            decay [0,1] - determines the length of the impulse response. 0.0 means zero seconds and 1.0 means the length of the input sample.
-            order [0, 100] - this controls the shape of the IR. 0 means no volume envelope (constant volume), 1 is a linear ramp, and 100 means the noise decays very quickly
-            width [0,1] - controls the stereo width of the sound
-            dry/wet [0,1] - i think you know this one
+Parameters:
+ - decay [0, 1] - determines the length of the impulse response. 0.0 means zero seconds and 1.0 means the length of the input sample.
+ - order [0, 100] - this controls the shape of the IR. 0 means no volume envelope (constant volume), 1 is a linear ramp, and 100 means the noise decays very quickly
+ - width [0, 1] - controls the stereo width of the sound
+ - dry/wet [0, 1] - i think you know this one
 
     Pad
         This lets you set a new length for the sample. Values higher than 1 will just pad the extra space with 0, and values lower than 1 will truncate the end of the sample. This results in time stretching and frequency shifting. Depending on the transform mode, this either pushes the frequencies up or down. 
