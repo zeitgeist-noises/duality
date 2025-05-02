@@ -6,6 +6,8 @@
 #include "ModeVisualizer.h"
 #include "MySlider.h"
 
+#define APVTS AudioProcessorValueTreeState
+
 //==============================================================================
 class DualityAudioProcessorEditor final : public juce::AudioProcessorEditor,
                                           public juce::FileDragAndDropTarget,
@@ -45,7 +47,7 @@ private:
     void transformButtonClicked();
 
     juce::ToggleButton transformOnlyToggle;
-    juce::AudioProcessorValueTreeState::ButtonAttachment transformOnlyAttachment;
+    std::optional<juce::APVTS::ButtonAttachment> transformOnlyAttachment;
     void toggleClicked();
 
     juce::TextButton saveButton;
@@ -53,19 +55,19 @@ private:
 
     std::vector<MySlider> sliders;
     std::vector<juce::Label> sliderLabels;
-    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment0;
-    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment1;
-    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment2;
-    juce::AudioProcessorValueTreeState::SliderAttachment sliderAttachment3;
+    std::optional<juce::APVTS::SliderAttachment> sliderAttachment0;
+    std::optional<juce::APVTS::SliderAttachment> sliderAttachment1;
+    std::optional<juce::APVTS::SliderAttachment> sliderAttachment2;
+    std::optional<juce::APVTS::SliderAttachment> sliderAttachment3;
     void handleSliders();
 
     juce::ComboBox effectList;
-    juce::AudioProcessorValueTreeState::ComboBoxAttachment effectAttachment;
+    std::optional<juce::APVTS::ComboBoxAttachment> effectAttachment;
     void effectSelected();
     bool isFirstLoad = true;
 
     juce::ComboBox modeList;
-    juce::AudioProcessorValueTreeState::ComboBoxAttachment modeAttachment;
+    std::optional<juce::APVTS::ComboBoxAttachment> modeAttachment;
     void modeSelected();
     ModeVisualizer modeUI;
 

@@ -9,17 +9,13 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         sourceWaveform(512, formatManager, thumbnailCache),
         transformedWaveform(512, formatManager, thumbnailCache),
         sliders(4),
-        sliderLabels(4),
-        transformOnlyAttachment(processorRef.apvts, "transformOnly", transformOnlyToggle),
-        effectAttachment(processorRef.apvts, "effect", effectList),
-        modeAttachment(processorRef.apvts, "mode", modeList),
-        sliderAttachment0(processorRef.apvts, "param_0", sliders[0]),
-        sliderAttachment1(processorRef.apvts, "param_1", sliders[1]),
-        sliderAttachment2(processorRef.apvts, "param_2", sliders[2]),
-        sliderAttachment3(processorRef.apvts, "param_3", sliders[3])
+        sliderLabels(4)
 {
+    if(!MessageManager::getInstance()->isThisTheMessageThread())
+        return;
+
     formatManager.registerBasicFormats();
-    setSize (600, 615);
+    setSize(600, 615);
     
     //gui controls
     addAndMakeVisible(openButton);
@@ -67,7 +63,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
 
     addAndMakeVisible(modeList);
     modeList.addItemList(processorRef.modeNames, 1);
-    modeList.setText(processorRef.transformMode);
     modeList.setColour(juce::ComboBox::ColourIds::backgroundColourId, highlightColour);
     modeList.setColour(juce::ComboBox::ColourIds::textColourId, bgColour);
     modeList.setColour(juce::ComboBox::ColourIds::arrowColourId, bgColour);
@@ -104,7 +99,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
 
     addAndMakeVisible(effectList);
     effectList.addItemList(EffectSlot::effectNames, 1);
-    effectList.setText(processorRef.effect->getEffectName());
     effectList.setColour(juce::ComboBox::ColourIds::backgroundColourId, highlightColour);
     effectList.setColour(juce::ComboBox::ColourIds::textColourId, bgColour);
     effectList.setColour(juce::ComboBox::ColourIds::arrowColourId, bgColour);
@@ -121,7 +115,6 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
         addAndMakeVisible(sliderLabels[i]);
         sliderLabels[i].attachToComponent(&sliders[i], true);
     }
-    handleSliders();
 
     //files
     juce::File appDataFolder = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory);
@@ -140,7 +133,23 @@ DualityAudioProcessorEditor::DualityAudioProcessorEditor (DualityAudioProcessor&
     sourceWaveform.addChangeListener(this);
     transformedWaveform.addChangeListener(this);
 
-    juce::MessageManager::callAsync([this]{loadFilesIntoEditor();});
+    juce::MessageManager::callAsync([this]()
+    {
+        loadFilesIntoEditor();
+
+        transformOnlyAttachment.emplace(processorRef.apvts, "transformOnly", transformOnlyToggle);
+        effectAttachment.emplace(processorRef.apvts, "effect", effectList);
+        modeAttachment.emplace(processorRef.apvts, "mode", modeList);
+
+        sliderAttachment0.emplace(processorRef.apvts, "param_0", sliders[0]);
+        sliderAttachment1.emplace(processorRef.apvts, "param_1", sliders[1]);
+        sliderAttachment2.emplace(processorRef.apvts, "param_2", sliders[2]);
+        sliderAttachment3.emplace(processorRef.apvts, "param_3", sliders[3]);
+
+        modeList.setText(processorRef.transformMode);
+        effectList.setText(processorRef.effect->getEffectName());
+        handleSliders();
+    });
 }
 
 DualityAudioProcessorEditor::~DualityAudioProcessorEditor()

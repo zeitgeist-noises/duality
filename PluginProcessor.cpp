@@ -161,7 +161,7 @@ bool DualityAudioProcessor::hasEditor() const
 }
 
 juce::AudioProcessorEditor* DualityAudioProcessor::createEditor()
-{
+{   
     return new DualityAudioProcessorEditor (*this);
 }
 
